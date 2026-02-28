@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+SQLAlchemy
+psycopg2-binary
+python-dotenv
+python-multipart
+pydantic
+openai
+pytesseract
+pdf2image
+opencv-python-headless
+numpy
+Pillow

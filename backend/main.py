@@ -10,7 +10,7 @@ import uuid
 import json
 from dotenv import load_dotenv
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 import base64
 
 from openai import OpenAI
@@ -376,7 +376,7 @@ import pytesseract
 import cv2
 import numpy as np
 
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 def extract_text_from_pdf(pdf_path):
 
@@ -717,7 +717,7 @@ def test_ocr():
     from PIL import Image
     import pytesseract
 
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    ## pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
     img = Image.open(r"D:\Aazhi\answer_papers\mcq1.png")
 
@@ -802,9 +802,14 @@ import json
 
 def extract_answers_from_pdf_with_ai(pdf_path):
 
-    pages = convert_from_path(
+    # pages = convert_from_path(
+    #     pdf_path,
+    #     poppler_path=r"C:\poppler-25.12.0\Library\bin"
+    # )
+
+        pages = convert_from_path(
         pdf_path,
-        poppler_path=r"C:\poppler-25.12.0\Library\bin"
+        poppler_path=r""
     )
 
     all_answers = {}
