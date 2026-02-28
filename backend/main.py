@@ -807,29 +807,29 @@ def extract_answers_from_pdf_with_ai(pdf_path):
     #     poppler_path=r"C:\poppler-25.12.0\Library\bin"
     # )
 
-    pages = convert_from_path(
-        pdf_path,
-        poppler_path=r""
-    )
+    # pages = convert_from_path(
+    #     pdf_path,
+    #     poppler_path=r""
+    # )
 
-    all_answers = {}
+    # all_answers = {}
 
-    for i, page in enumerate(pages):
+    # for i, page in enumerate(pages):
 
-        temp_image_path = f"temp_page_{i}.jpg"
-        page.save(temp_image_path, "JPEG")
+    #     temp_image_path = f"temp_page_{i}.jpg"
+    #     page.save(temp_image_path, "JPEG")
 
-        ai_json = extract_answers_from_image(temp_image_path)
-        parsed = json.loads(ai_json)
+    #     ai_json = extract_answers_from_image(temp_image_path)
+    #     parsed = json.loads(ai_json)
 
-        for ans in parsed.get("answers", []):
-            q_no = ans.get("question_number")
-            text = ans.get("answer_text")
+    #     for ans in parsed.get("answers", []):
+    #         q_no = ans.get("question_number")
+    #         text = ans.get("answer_text")
 
-            if q_no:
-                all_answers[int(q_no)] = text
+    #         if q_no:
+    #             all_answers[int(q_no)] = text
 
-    return all_answers
+    return 
 
 
 @app.get("/submission-result/{submission_id}")
