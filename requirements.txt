@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+openai
+streamlit
+sqlalchemy
+python-dotenv
+requests
+pydantic
+
+# File upload
+python-multipart
+
+# OCR
+pdf2image
+pytesseract
+Pillow
+
