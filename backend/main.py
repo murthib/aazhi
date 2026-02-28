@@ -1,5 +1,4 @@
 from http.client import HTTPException
-from turtle import st, update
 from unittest import result
 
 from fastapi import FastAPI, Depends
