@@ -807,7 +807,7 @@ def extract_answers_from_pdf_with_ai(pdf_path):
     #     poppler_path=r"C:\poppler-25.12.0\Library\bin"
     # )
 
-        pages = convert_from_path(
+    pages = convert_from_path(
         pdf_path,
         poppler_path=r""
     )
