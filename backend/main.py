@@ -1730,3 +1730,12 @@ def publish_exam(exam_id: str, db: Session = Depends(get_db)):
     db.commit()
 
     return {"message": "Exam published successfully"}
+
+
+
+
+@app.get("/")
+def home():
+    return {"message": "Aazhi Backend is Running 🚀"}
+
+
