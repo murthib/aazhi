@@ -744,6 +744,10 @@ def extract_answers_from_pdf_with_ai(pdf_path):
         temperature=0,
         messages=[
             {
+                "role": "system",
+                "content": "You are an expert exam paper reader."
+            },
+            {
                 "role": "user",
                 "content": [
                     {"type": "text", "text": prompt},
@@ -1695,3 +1699,10 @@ app.add_middleware(
 
 
 
+@app.get("/debug-db")
+def debug_db():
+    import os
+    return {"DATABASE_URL": os.getenv("DATABASE_URL")}
+
+
+    
