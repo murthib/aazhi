@@ -1705,4 +1705,9 @@ def debug_db():
     return {"DATABASE_URL": os.getenv("DATABASE_URL")}
 
 
-    
+@app.get("/check-tables")
+def check_tables():
+    from sqlalchemy import inspect, text
+    from models.database import engine
+    inspector = inspect(engine)
+    return {"tables": inspector.get_table_names(schema="public")}
