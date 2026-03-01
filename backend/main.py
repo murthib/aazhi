@@ -377,35 +377,37 @@ import numpy as np
 
 # pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-def extract_text_from_pdf(pdf_path):
+# # def extract_text_from_pdf(pdf_path):
 
-    pages = convert_from_path(
-        pdf_path,
-        poppler_path=r"C:\poppler-25.12.0\Library\bin"
-    )
+# #     pages = convert_from_path(
+# #         pdf_path,
+# #         poppler_path=r"C:\poppler-25.12.0\Library\bin"
+# #     )
 
-    text = ""
+# #     text = ""
 
-    for page in pages:
+# #     for page in pages:
 
-        # Convert PIL image to OpenCV format
-        img = np.array(page)
-        img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+# #         # Convert PIL image to OpenCV format
+# #         img = np.array(page)
+# #         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
-        # Increase contrast
-        img = cv2.GaussianBlur(img, (5, 5), 0)
-        _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+# #         # Increase contrast
+# #         img = cv2.GaussianBlur(img, (5, 5), 0)
+# #         _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-        # OCR with better config
-        custom_config = r'--oem 3 --psm 6'
+# #         # OCR with better config
+# #         custom_config = r'--oem 3 --psm 6'
 
-        page_text = pytesseract.image_to_string(img, config=custom_config)
+# #         page_text = pytesseract.image_to_string(img, config=custom_config)
 
-        text += page_text + "\n"
+# #         text += page_text + "\n"
 
-    print("OCR TEXT:", text)
+# #     print("OCR TEXT:", text)
 
-    return text
+# #     return text
+
+
 
 def evaluate_answer(student_text, correct_answer, max_marks, grading_mode):
 
@@ -608,123 +610,72 @@ def get_submissions_for_review(db: Session = Depends(get_db)):
         for s in submissions
     ]
 
-import re
-
-def extract_mcq_answers(ocr_text):
-    """
-    Extracts answers like:
-    Q1 - B
-    1. A
-    """
-
-    pattern = r'(?:Q)?(\d+)[\s\.\-:]+([A-D])'
-    matches = re.findall(pattern, ocr_text, re.IGNORECASE)
-
-    answers = {}
-
-    for q_no, option in matches:
-        answers[int(q_no)] = option.upper()
-
-    return answers
 
 
-@app.post("/evaluate-mcq-from-submission/{submission_id}")
-def evaluate_mcq_from_submission(submission_id: int, db: Session = Depends(get_db)):
+# # @app.post("/evaluate-mcq-from-submission/{submission_id}")
+# # def evaluate_mcq_from_submission(submission_id: int, db: Session = Depends(get_db)):
 
-    submission = db.query(Submission).filter(
-        Submission.id == submission_id
-    ).first()
+# #     submission = db.query(Submission).filter(
+# #         Submission.id == submission_id
+# #     ).first()
 
-    if not submission:
-        return {"error": "Submission not found"}
+# #     if not submission:
+# #         return {"error": "Submission not found"}
 
-    # Step 1: OCR
-    extracted_text = extract_text_from_pdf(submission.uploaded_pdf_path)
+# #     # Step 1: OCR
+# #     extracted_text = extract_text_from_pdf(submission.uploaded_pdf_path)
 
-    submission.extracted_text = extracted_text
-    db.commit()
+# #     submission.extracted_text = extracted_text
+# #     db.commit()
 
-    # Step 2: Extract MCQ answers
-    mcq_answers = extract_mcq_answers(extracted_text)
+# #     # Step 2: Extract MCQ answers
+# #     mcq_answers = extract_mcq_answers(extracted_text)
 
-    # Step 3: Get MCQ questions
-    questions = db.query(Question).filter(
-        Question.exam_id == submission.exam_id,
-        Question.question_type == "MCQ"
-    ).all()
+# #     # Step 3: Get MCQ questions
+# #     questions = db.query(Question).filter(
+# #         Question.exam_id == submission.exam_id,
+# #         Question.question_type == "MCQ"
+# #     ).all()
 
-    total_marks = 0
+# #     total_marks = 0
 
-    for q in questions:
+# #     for q in questions:
 
-        student_option_letter = mcq_answers.get(q.question_number)
+# #         student_option_letter = mcq_answers.get(q.question_number)
 
-        if not student_option_letter:
-            continue
+# #         if not student_option_letter:
+# #             continue
 
-        correct_letter = q.correct_option
+# #         correct_letter = q.correct_option
 
-        is_correct = student_option_letter == correct_letter
-        marks = q.max_marks if is_correct else 0
+# #         is_correct = student_option_letter == correct_letter
+# #         marks = q.max_marks if is_correct else 0
 
-        response = StudentResponse(
-            student_id=submission.student_id,
-            submission_id=submission.id,
-            question_id=q.id,
-            ai_is_correct=is_correct,
-            ai_marks_awarded=marks,
-            final_marks=marks,
-            evaluated_status="AI_EVALUATED"
-        )
+# #         response = StudentResponse(
+# #             student_id=submission.student_id,
+# #             submission_id=submission.id,
+# #             question_id=q.id,
+# #             ai_is_correct=is_correct,
+# #             ai_marks_awarded=marks,
+# #             final_marks=marks,
+# #             evaluated_status="AI_EVALUATED"
+# #         )
 
-        db.add(response)
+# #         db.add(response)
 
-        total_marks += marks
+# #         total_marks += marks
 
-    submission.ai_total_marks = total_marks
-    submission.status = "AI_EVALUATED"
+# #     submission.ai_total_marks = total_marks
+# #     submission.status = "AI_EVALUATED"
 
-    db.commit()
+# #     db.commit()
 
-    return {"total_mcq_marks": total_marks}
-
-
-from models.database import Student
-
-@app.post("/create-student")
-def create_student(db: Session = Depends(get_db)):
-
-    student = Student(
-        student_id="S001",
-        name="Ananya",
-        password="1234"
-    )
-
-    db.add(student)
-    db.commit()
-    db.refresh(student)
-
-    return {
-        "message": "Student created",
-        "id": student.id
-    }
+# #     return {"total_mcq_marks": total_marks}
 
 
 
-@app.get("/test-ocr")
-def test_ocr():
-    from PIL import Image
-    import pytesseract
 
-    ## pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-    img = Image.open(r"D:\Aazhi\answer_papers\mcq1.png")
-
-    text = pytesseract.image_to_string(img)
-
-    print("OCR RESULT:", text)
-
-    return {"text": text}
 
 def encode_image(image_path):
     with open(image_path, "rb") as f:
@@ -797,38 +748,61 @@ def extract_answers_from_image(image_path):
 
 
 from pdf2image import convert_from_path
+from io import BytesIO
 import json
 
 def extract_answers_from_pdf_with_ai(pdf_path):
 
-    # pages = convert_from_path(
-    #     pdf_path,
-    #     poppler_path=r"C:\poppler-25.12.0\Library\bin"
-    # )
+    pages = convert_from_path(pdf_path)
+    all_answers = {}
 
-    # pages = convert_from_path(
-    #     pdf_path,
-    #     poppler_path=r""
-    # )
+    for page in pages:
+        buffer = BytesIO()
+        page.save(buffer, format="JPEG")
+        buffer.seek(0)
 
-    # all_answers = {}
+        ai_json = extract_answers_from_image(buffer)
+        parsed = json.loads(ai_json)
 
-    # for i, page in enumerate(pages):
+        for ans in parsed.get("answers", []):
+            q_no = ans.get("question_number")
+            text = ans.get("answer_text")
 
-    #     temp_image_path = f"temp_page_{i}.jpg"
-    #     page.save(temp_image_path, "JPEG")
+            if q_no:
+                all_answers[int(q_no)] = text
 
-    #     ai_json = extract_answers_from_image(temp_image_path)
-    #     parsed = json.loads(ai_json)
+    return all_answers
 
-    #     for ans in parsed.get("answers", []):
-    #         q_no = ans.get("question_number")
-    #         text = ans.get("answer_text")
+# def extract_answers_from_pdf_with_ai(pdf_path):
 
-    #         if q_no:
-    #             all_answers[int(q_no)] = text
+#     # pages = convert_from_path(
+#     #     pdf_path,
+#     #     poppler_path=r"C:\poppler-25.12.0\Library\bin"
+#     # )
 
-    return 
+#     # pages = convert_from_path(
+#     #     pdf_path,
+#     #     poppler_path=r""
+#     # )
+
+#     # all_answers = {}
+
+#     # for i, page in enumerate(pages):
+
+#     #     temp_image_path = f"temp_page_{i}.jpg"
+#     #     page.save(temp_image_path, "JPEG")
+
+#     #     ai_json = extract_answers_from_image(temp_image_path)
+#     #     parsed = json.loads(ai_json)
+
+#     #     for ans in parsed.get("answers", []):
+#     #         q_no = ans.get("question_number")
+#     #         text = ans.get("answer_text")
+
+#     #         if q_no:
+#     #             all_answers[int(q_no)] = text
+
+#     return 
 
 
 @app.get("/submission-result/{submission_id}")
