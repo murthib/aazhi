@@ -19,7 +19,7 @@ APP_SETTINGS = {
 
 # API_URL = "http://127.0.0.1:8000"
 
-API_URL = "https://aazhi-c2yt.onrender.com"
+API_URL = "https://aazhi-1.onrender.com"
 
 st.set_page_config(page_title="EduEval AI", layout="wide")
 
