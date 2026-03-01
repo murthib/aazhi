@@ -368,10 +368,10 @@ def submit_exam(
     }
 
 
-from pdf2image import convert_from_path
-import pytesseract
-import cv2
-import numpy as np
+# from pdf2image import convert_from_path
+# import pytesseract
+# import cv2
+# import numpy as np
 
 # pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
