@@ -17,7 +17,9 @@ APP_SETTINGS = {
     "AUTO_GRADING_AFTER_SUBMISSION": True  # 🔁 Toggle this
 }
 
-API_URL = "http://127.0.0.1:8000"
+# API_URL = "http://127.0.0.1:8000"
+
+API_URL = "https://aazhi-c2yt.onrender.com"
 
 st.set_page_config(page_title="EduEval AI", layout="wide")
 
