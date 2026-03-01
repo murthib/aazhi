@@ -53,10 +53,10 @@ APP_SETTINGS = {
 
 
 # Relative imports (IMPORTANT)
-from .models.database import save_exam_to_db, get_db
-from .agents.exam_agent import generate_exam
+from models.database import save_exam_to_db, get_db
+from agents.exam_agent import generate_exam
 
-from .models.database import (
+from models.database import (
     save_exam_to_db,
     get_db,
     Student,
@@ -72,14 +72,14 @@ from .models.database import (
 
 app = FastAPI()
 
-from .models.database import Student
+from models.database import Student
 
 class StudentLogin(BaseModel):
     student_id: str
     password: str
 
 
-from .models.database import (
+from models.database import (
     AcademicLevel,
     Subject,
     Teacher,
@@ -273,7 +273,7 @@ def create_exam(request: ExamRequest, db: Session = Depends(get_db)):
 
 
 
-from .models.database import Exam
+from models.database import Exam
 
 @app.get("/exams")
 def get_exams(db: Session = Depends(get_db)):
@@ -689,7 +689,7 @@ def evaluate_mcq_from_submission(submission_id: int, db: Session = Depends(get_d
     return {"total_mcq_marks": total_marks}
 
 
-from .models.database import Student
+from models.database import Student
 
 @app.post("/create-student")
 def create_student(db: Session = Depends(get_db)):
