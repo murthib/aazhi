@@ -8,8 +8,6 @@ from datetime import date, datetime
 import uuid
 import json
 from dotenv import load_dotenv
-import pytesseract
-# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 import base64
 
 from openai import OpenAI
