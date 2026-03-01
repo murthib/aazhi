@@ -368,45 +368,6 @@ def submit_exam(
     }
 
 
-# from pdf2image import convert_from_path
-# import pytesseract
-# import cv2
-# import numpy as np
-
-# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-# # def extract_text_from_pdf(pdf_path):
-
-# #     pages = convert_from_path(
-# #         pdf_path,
-# #         poppler_path=r"C:\poppler-25.12.0\Library\bin"
-# #     )
-
-# #     text = ""
-
-# #     for page in pages:
-
-# #         # Convert PIL image to OpenCV format
-# #         img = np.array(page)
-# #         img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-
-# #         # Increase contrast
-# #         img = cv2.GaussianBlur(img, (5, 5), 0)
-# #         _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-# #         # OCR with better config
-# #         custom_config = r'--oem 3 --psm 6'
-
-# #         page_text = pytesseract.image_to_string(img, config=custom_config)
-
-# #         text += page_text + "\n"
-
-# #     print("OCR TEXT:", text)
-
-# #     return text
-
-
-
 def evaluate_answer(student_text, correct_answer, max_marks, grading_mode):
 
     # 🔹 Preserve core strict grading rules
@@ -744,63 +705,74 @@ def extract_answers_from_image(image_path):
 
     return response.choices[0].message.content
 
-
-from pdf2image import convert_from_path
-from io import BytesIO
-import json
-
 def extract_answers_from_pdf_with_ai(pdf_path):
 
-    pages = convert_from_path(pdf_path)
+    with open(pdf_path, "rb") as f:
+        pdf_bytes = f.read()
+
+    base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+
+    prompt = """
+    You are reading a student's full exam answer sheet.
+
+    The PDF may contain:
+    - MCQ answers (A/B/C/D)
+    - Short descriptive answers
+    - Long descriptive answers
+    - Multiple pages
+
+    Important:
+    - Student writes clear question numbers.
+    - Each answer starts with its question number.
+    - Do NOT invent content.
+    - If unreadable, mark as "[unclear]".
+
+    Return STRICT JSON:
+    {
+        "answers": [
+            {
+                "question_number": 1,
+                "answer_text": "..."
+            }
+        ]
+    }
+    """
+
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        response_format={"type": "json_object"},
+        temperature=0,
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "file",
+                        "file": {
+                            "filename": "student_answer.pdf",
+                            "file_data": f"data:application/pdf;base64,{base64_pdf}"
+                        }
+                    }
+                ]
+            }
+        ]
+    )
+
+    parsed = json.loads(response.choices[0].message.content)
+
     all_answers = {}
 
-    for page in pages:
-        buffer = BytesIO()
-        page.save(buffer, format="JPEG")
-        buffer.seek(0)
+    for ans in parsed.get("answers", []):
+        q_no = ans.get("question_number")
+        text = ans.get("answer_text")
 
-        ai_json = extract_answers_from_image(buffer)
-        parsed = json.loads(ai_json)
-
-        for ans in parsed.get("answers", []):
-            q_no = ans.get("question_number")
-            text = ans.get("answer_text")
-
-            if q_no:
-                all_answers[int(q_no)] = text
+        if q_no:
+            all_answers[int(q_no)] = text
 
     return all_answers
 
-# def extract_answers_from_pdf_with_ai(pdf_path):
 
-#     # pages = convert_from_path(
-#     #     pdf_path,
-#     #     poppler_path=r"C:\poppler-25.12.0\Library\bin"
-#     # )
-
-#     # pages = convert_from_path(
-#     #     pdf_path,
-#     #     poppler_path=r""
-#     # )
-
-#     # all_answers = {}
-
-#     # for i, page in enumerate(pages):
-
-#     #     temp_image_path = f"temp_page_{i}.jpg"
-#     #     page.save(temp_image_path, "JPEG")
-
-#     #     ai_json = extract_answers_from_image(temp_image_path)
-#     #     parsed = json.loads(ai_json)
-
-#     #     for ans in parsed.get("answers", []):
-#     #         q_no = ans.get("question_number")
-#     #         text = ans.get("answer_text")
-
-#     #         if q_no:
-#     #             all_answers[int(q_no)] = text
-
-#     return 
 
 
 @app.get("/submission-result/{submission_id}")
